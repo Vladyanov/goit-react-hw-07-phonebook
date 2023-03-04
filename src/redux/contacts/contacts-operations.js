@@ -52,16 +52,3 @@ export const fetchDeleteContact = createAsyncThunk(
     }
   }
 );
-
-// export const fetchDeleteContact = id => {
-//   const func = async dispatch => {
-//     try {
-//       dispatch(actions.fetchDeleteContactLoading());
-//       await api.deleteContact(id);
-//       dispatch(actions.fetchDeleteContactSuccess(id));
-//     } catch ({ response }) {
-//       dispatch(actions.fetchDeleteContactError(response.data.message));
-//     }
-//   };
-//   return func;
-// };
