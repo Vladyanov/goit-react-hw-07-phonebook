@@ -13,10 +13,7 @@ import {
 // import { addContact, removeContact } from 'redux/contacts/contacts-slice';
 import { setFilter } from 'redux/filter/filter-slice';
 
-import {
-  getAllContacts,
-  getFilteredContacts,
-} from 'redux/contacts/contacts-selectors';
+import { getFilteredContacts } from 'redux/contacts/contacts-selectors';
 import { getFilter } from 'redux/filter/filter-selectors';
 
 import css from './phone-book.module.scss';
