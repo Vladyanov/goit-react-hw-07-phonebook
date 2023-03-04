@@ -10,7 +10,7 @@ import {
   fetchAddContact,
   fetchDeleteContact,
 } from 'redux/contacts/contacts-operations';
-// import { addContact, removeContact } from 'redux/contacts/contacts-slice';
+
 import { setFilter } from 'redux/filter/filter-slice';
 
 import { getFilteredContacts } from 'redux/contacts/contacts-selectors';
