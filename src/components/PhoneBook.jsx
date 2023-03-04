@@ -1,12 +1,16 @@
 import { useSelector, useDispatch } from 'react-redux';
-
-import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import { useEffect } from 'react';
 
 import ContactsList from './PhoneBook/ContactsList/ContactsList';
 import ContactsFilter from './ContactsFilter/ContactsFilter';
 import ContactsForm from './ContactsForm/ContactsForm';
 
-import { addContact, removeContact } from 'redux/contacts/contacts-slice';
+import {
+  fetchAllContacts,
+  fetchAddContact,
+  fetchDeleteContact,
+} from 'redux/contacts/contacts-operations';
+// import { addContact, removeContact } from 'redux/contacts/contacts-slice';
 import { setFilter } from 'redux/filter/filter-slice';
 
 import {
@@ -18,32 +22,22 @@ import { getFilter } from 'redux/filter/filter-selectors';
 import css from './phone-book.module.scss';
 
 const PhoneBook = () => {
-  const contacts = useSelector(getAllContacts);
   const filteredContacts = useSelector(getFilteredContacts);
   const filter = useSelector(getFilter);
 
   const dispatch = useDispatch();
 
-  const isDuplicate = name => {
-    const normalizedName = name.toLowerCase();
-
-    const isUnique = contacts.find(({ name }) => {
-      return name.toLocaleLowerCase() === normalizedName;
-    });
-    return isUnique;
-  };
+  useEffect(() => {
+    dispatch(fetchAllContacts());
+  }, [dispatch]);
 
   const onAddContact = ({ name, number }) => {
-    if (isDuplicate(name)) {
-      return Notify.failure(`${name} is already in contacts list`);
-    }
-
-    const action = addContact({ name, number });
+    const action = fetchAddContact({ name, number });
     dispatch(action);
   };
 
   const handleRemoveContact = id => {
-    const action = removeContact(id);
+    const action = fetchDeleteContact(id);
     dispatch(action);
   };
 
