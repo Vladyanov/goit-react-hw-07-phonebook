@@ -1,58 +1,67 @@
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import { createAsyncThunk } from '@reduxjs/toolkit';
 
 import * as api from '../../shared/contacts-api';
 
-import * as actions from './contacts-actions';
-
-export const fetchAllContacts = () => {
-  const func = async dispatch => {
+export const fetchAllContacts = createAsyncThunk(
+  'contacts/fetchAll',
+  async (_, thunkAPI) => {
     try {
-      dispatch(actions.fetchAllContactsLoading());
       const data = await api.getAllContacts();
-      dispatch(actions.fetchAllContactsSuccess(data));
+      return data;
     } catch ({ response }) {
-      dispatch(actions.fetchAllContactsError(response.data.message));
+      return thunkAPI.rejectWithValue(response.data.message);
     }
-  };
-  return func;
-};
+  }
+);
 
-const isDuplicate = (contacts, { name }) => {
-  const normalizedName = name.toLowerCase();
-
-  const isUnique = contacts.find(({ name }) => {
-    return name.toLocaleLowerCase() === normalizedName;
-  });
-  return isUnique;
-};
-
-export const fetchAddContact = data => {
-  const func = async (dispatch, getState) => {
+export const fetchAddContact = createAsyncThunk(
+  'contacts/add',
+  async (data, { rejectWithValue }) => {
     try {
-      const { contacts } = getState();
-      if (isDuplicate(contacts.items, data)) {
-        return Notify.failure(`${data.name} is already in contacts list`);
-      }
-      dispatch(actions.fetchAddContactLoading);
       const result = await api.addContact(data);
-      dispatch(actions.fetchAddContactSuccess(result));
+      return result;
     } catch ({ response }) {
-      dispatch(actions.fetchAddContactError(response.data.message));
+      return rejectWithValue(response.data.message);
     }
-  };
+  },
+  {
+    condition: ({ name }, { getState }) => {
+      const { contacts } = getState();
+      const normalizedName = name.toLowerCase();
 
-  return func;
-};
+      const isUnique = contacts.items.find(({ name }) => {
+        return name.toLocaleLowerCase() === normalizedName;
+      });
+      if (isUnique) {
+        Notify.failure(`${name} is already in contacts list`);
+        return false;
+      }
+    },
+  }
+);
 
-export const fetchDeleteContact = id => {
-  const func = async dispatch => {
+export const fetchDeleteContact = createAsyncThunk(
+  'contacts/delete',
+  async (id, { rejectWithValue }) => {
     try {
-      dispatch(actions.fetchDeleteContactLoading());
       await api.deleteContact(id);
-      dispatch(actions.fetchDeleteContactSuccess(id));
+      return id;
     } catch ({ response }) {
-      dispatch(actions.fetchDeleteContactError(response.data.message));
+      return rejectWithValue(response.data.message);
     }
-  };
-  return func;
-};
+  }
+);
+
+// export const fetchDeleteContact = id => {
+//   const func = async dispatch => {
+//     try {
+//       dispatch(actions.fetchDeleteContactLoading());
+//       await api.deleteContact(id);
+//       dispatch(actions.fetchDeleteContactSuccess(id));
+//     } catch ({ response }) {
+//       dispatch(actions.fetchDeleteContactError(response.data.message));
+//     }
+//   };
+//   return func;
+// };
